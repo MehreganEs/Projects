@@ -1,4 +1,4 @@
-# PIZZA SALES
+# PIZZA SALES MySQL Queries:
 
 
 ## A. KPI’s
