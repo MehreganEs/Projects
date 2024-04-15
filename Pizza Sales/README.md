@@ -16,8 +16,8 @@
 - Visualization: The insights derived from the analysis are visualized using Power BI. Interactive charts, graphs, and reports are created to present the findings in a clear and compelling manner.
 
 ## Dashboards
-![alt text](<Pizza sales-1.png>)
-![alt text](<Pizza sales-2.png>)
+![alt text](<Pizza sales.jpg>)
+![alt text](<Pizza sales-1.jpg>)
 
 ## MySQL Queries
 ### A. KPI’s
