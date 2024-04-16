@@ -8,13 +8,24 @@ This initiative examines Walmart's sales data, focusing on identifying the stron
 ## Project Goals
 The main goal of this analysis is to derive insights from Walmart's sales data, aiming to decipher the diverse factors that drive sales performance across its various branches.
 
+## Analysis Structure and Question Types
+### Product Analysis
+The objective of this inquiry is to dissect the assortment of product series, spotlighting those that excel in performance and pinpointing those that warrant enhancement.
+### Sales Analysis
+The purpose here is to decode the patterns of product sales. Insights gleaned from this evaluation will aid in appraising the impact of our marketing tactics and determining necessary adjustments to bolster revenue.
+
+
+### Customer Analysis
+The goal of this examination is to unravel the layers of customer demographics, tracking their buying patterns and assessing the profitability of distinct customer groups.
+
+
 ## MySQL Queries
-### Create database
+### Create Database walmartSales
 ```sql
 CREATE DATABASE IF NOT EXISTS walmartSales;
 ```
 
-### Create table
+### Create Table sales
 ```sql
 CREATE TABLE IF NOT EXISTS sales(
 	invoice_id VARCHAR(30) NOT NULL PRIMARY KEY,
@@ -40,300 +51,274 @@ CREATE TABLE IF NOT EXISTS sales(
 
 ### Add the `time_of_day` column
 ```sql
-SELECT
-	*
-FROM sales;
+ELECT *
+FROM   sales;
 
-SELECT
-	time,
-	(CASE
-		WHEN `time` BETWEEN "00:00:00" AND "12:00:00" THEN "Morning"
-        WHEN `time` BETWEEN "12:01:00" AND "16:00:00" THEN "Afternoon"
-        ELSE "Evening"
-    END) AS time_of_day
-FROM sales;
+SELECT TIME,
+       ( CASE
+           WHEN ` TIME ` BETWEEN "00:00:00" AND "12:00:00" THEN "morning"
+           WHEN ` TIME ` BETWEEN "12:01:00" AND "16:00:00" THEN "afternoon"
+           ELSE "evening"
+         END ) AS time_of_day
+FROM   sales;
 
-ALTER TABLE sales ADD COLUMN time_of_day VARCHAR(20);
+ALTER TABLE sales
+  ADD COLUMN time_of_day VARCHAR(20);
 
 UPDATE sales
-SET time_of_day = (
-	CASE
-		WHEN `time` BETWEEN "00:00:00" AND "12:00:00" THEN "Morning"
-        WHEN `time` BETWEEN "12:01:00" AND "16:00:00" THEN "Afternoon"
-        ELSE "Evening"
-    END
-);
+SET    time_of_day = ( CASE
+                         WHEN ` TIME ` BETWEEN "00:00:00" AND "12:00:00" THEN
+                         "morning"
+                         WHEN ` TIME ` BETWEEN "12:01:00" AND "16:00:00" THEN
+                         "afternoon"
+                         ELSE "evening"
+                       END ); 
 ```
 ### Add `day_name` column
 ```sql
-ELECT
-	date,
-	DAYNAME(date)
-FROM sales;
+SELECT DATE,
+       Dayname(DATE)
+FROM   sales;
 
-ALTER TABLE sales ADD COLUMN day_name VARCHAR(10);
+ALTER TABLE sales
+  ADD COLUMN day_name VARCHAR(10);
 
 UPDATE sales
-SET day_name = DAYNAME(date);
+SET    day_name = Dayname(DATE); 
 ```
 ### Add month_name column
 ```sql
-SELECT
-	date,
-	MONTHNAME(date)
-FROM sales;
+SELECT DATE,
+       Monthname(DATE)
+FROM   sales;
 
-ALTER TABLE sales ADD COLUMN month_name VARCHAR(10);
+ALTER TABLE sales
+  ADD COLUMN month_name VARCHAR(10);
 
 UPDATE sales
-SET month_name = MONTHNAME(date);
+SET    month_name = Monthname(DATE); 
 ```
 ### General Questions
 #### How many unique cities does the data have?
 ```sql
-SELECT 
-	DISTINCT city
-FROM sales;
+SELECT DISTINCT city
+FROM   sales; 
 ```
 #### In which city is each branch?
 ```sql
-SELECT 
-	DISTINCT city,
-    branch
-FROM sales;
+SELECT DISTINCT city,
+                branch
+FROM sales; 
 ```
 ### Product-related Questions
-How many unique product lines does the data have?
+#### How many unique product lines does the data have?
 ```sql
-ALTER TABLE sales RENAME COLUMN `Product line` TO Product_line;
-
-SELECT
-	DISTINCT product_line
+ALTER TABLE sales rename COLUMN `product line` TO product_line;SELECT DISTINCT product_line
 FROM sales;
 ```
-What is the most selling product line
+#### What is the most selling product line
 ```sql
-SELECT
-	SUM(quantity) AS qty,
-    product_line
-FROM sales
-GROUP BY product_line
-ORDER BY qty DESC;
+SELECT Sum(quantity) AS qty,
+       product_line
+FROM   sales
+GROUP  BY product_line
+ORDER  BY qty DESC; 
 
 ```
-What is the total revenue by month
+#### What is the total revenue by month
 ```sql
-SELECT
-	month_name AS month,
-	SUM(total) AS total_revenue
-FROM sales
-GROUP BY month_name 
-ORDER BY total_revenue;
+SELECT month_name AS month,
+       Sum(total) AS total_revenue
+FROM   sales
+GROUP  BY month_name
+ORDER  BY total_revenue; 
 ```
-What month had the largest COGS?
+#### What month had the largest COGS?
 ```sql
-SELECT
-	month_name AS month,
-	SUM(cogs) AS cogs
-FROM sales
-GROUP BY month_name 
-ORDER BY cogs;
+SELECT month_name AS month,
+       Sum(cogs)  AS cogs
+FROM   sales
+GROUP  BY month_name
+ORDER  BY cogs; 
 ```
-What product line had the largest revenue?
+#### What product line had the largest revenue?
 ```sql
-SELECT
-	product_line,
-	SUM(total) as total_revenue
-FROM sales
-GROUP BY product_line
-ORDER BY total_revenue DESC;
+SELECT product_line,
+       Sum(total) AS total_revenue
+FROM   sales
+GROUP  BY product_line
+ORDER  BY total_revenue DESC; 
 ```
-What is the city with the largest revenue?
+#### What is the city with the largest revenue?
 ```sql
-SELECT
-	branch,
-	city,
-	SUM(total) AS total_revenue
-FROM sales
-GROUP BY city, branch 
-ORDER BY total_revenue;
+SELECT branch,
+       city,
+       Sum(total) AS total_revenue
+FROM   sales
+GROUP  BY city,
+          branch
+ORDER  BY total_revenue; 
 ```
-What product line had the largest VAT?
+#### What product line had the largest VAT?
 ```sql
-ALTER TABLE sales RENAME COLUMN `Tax 5%` TO tax_pct;
-
-SELECT
-	product_line,
-	AVG(tax_pct) as avg_tax
-FROM sales
+ALTER TABLE sales rename COLUMN `tax 5%` TO tax_pct;SELECT   product_line,
+         Avg(tax_pct) AS avg_tax
+FROM     sales
 GROUP BY product_line
 ORDER BY avg_tax DESC;
 ```
-Average sales condition
+#### Average sales condition
 ```sql
 -- line showing "Good", "Bad". Good if its greater than average sales
 
-SELECT 
-	AVG(quantity) AS avg_qnty
-FROM sales;
+SELECT Avg(quantity) AS avg_qnty
+FROM   sales;
 
-SELECT
-	product_line,
-	CASE
-		WHEN AVG(quantity) > 6 THEN "Good"
-        ELSE "Bad"
-    END AS remark
-FROM sales
-GROUP BY product_line;
+SELECT product_line,
+       CASE
+         WHEN Avg(quantity) > 6 THEN "good"
+         ELSE "bad"
+       END AS remark
+FROM   sales
+GROUP  BY product_line; 
 ```
-Which branch sold more products than average product sold?
+#### Which branch sold more products than average product sold?
 ```sql
-SELECT 
-	branch, 
-    SUM(quantity) AS qnty
-FROM sales
-GROUP BY branch
-HAVING SUM(quantity) > (SELECT AVG(quantity) FROM sales);
+SELECT branch,
+       Sum(quantity) AS qnty
+FROM   sales
+GROUP  BY branch
+HAVING Sum(quantity) > (SELECT Avg(quantity)
+FROM   sales); 
 ```
-What is the most common product line by gender
+#### What is the most common product line by gender
 ```sql
-SELECT
-	gender,
-    product_line,
-    COUNT(gender) AS total_cnt
-FROM sales
-GROUP BY gender, product_line
-ORDER BY total_cnt DESC;
+SELECT gender,
+       product_line,
+       Count(gender) AS total_cnt
+FROM   sales
+GROUP  BY gender,
+          product_line
+ORDER  BY total_cnt DESC;
 ```
-What is the average rating of each product line
+#### What is the average rating of each product line
 ```sql
-SELECT
-	ROUND(AVG(rating), 2) as avg_rating,
-    product_line
-FROM sales
-GROUP BY product_line
-ORDER BY avg_rating DESC;
+SELECT Round(Avg(rating), 2) AS avg_rating,
+       product_line
+FROM   sales
+GROUP  BY product_line
+ORDER  BY avg_rating DESC; 
 ```
 ### Customers-related Questions
-How many unique customer types does the data have?
+#### How many unique customer types does the data have?
 ```sql
-ALTER TABLE sales RENAME COLUMN `customer type` TO customer_type;
-
-SELECT
-	DISTINCT customer_type
+ALTER TABLE sales rename COLUMN `customer type` TO customer_type;SELECT DISTINCT customer_type
 FROM sales;
 ```
-How many unique payment methods does the data have?
+#### How many unique payment methods does the data have?
 ```sql
-SELECT
-	DISTINCT payment
-FROM sales;
+SELECT DISTINCT payment
+FROM   sales; 
 ```
-What is the most common customer type?
+#### What is the most common customer type?
 ```sql
-SELECT
-	customer_type,
-	count(*) as count
-FROM sales
-GROUP BY customer_type
-ORDER BY count DESC;
+SELECT customer_type,
+       Count(*) AS count
+FROM   sales
+GROUP  BY customer_type
+ORDER  BY count DESC; 
 ```
-Which customer type buys the most?
+#### Which customer type buys the most?
 ```sql
-SELECT
-	customer_type,
-    COUNT(*) AS Purchases
-FROM sales
-GROUP BY customer_type;
+SELECT customer_type,
+       Count(*) AS Purchases
+FROM   sales
+GROUP  BY customer_type; 
 ```
-What is the gender of most of the customers?
+#### What is the gender of most of the customers?
 ```sql
-SELECT
-	gender,
-	COUNT(*) as gender_cnt
-FROM sales
-GROUP BY gender
-ORDER BY gender_cnt DESC;
+SELECT gender,
+       Count(*) AS gender_cnt
+FROM   sales
+GROUP  BY gender
+ORDER  BY gender_cnt DESC; 
 ```
-What is the gender distribution per branch?
+#### What is the gender distribution per branch?
 ```sql
-SELECT
-  branch, gender,
-	COUNT(*) as gender_cnt
-FROM sales
-GROUP BY branch, gender
-ORDER BY gender_cnt DESC;
+SELECT branch,
+       gender,
+       Count(*) AS gender_cnt
+FROM   sales
+GROUP  BY branch,
+          gender
+ORDER  BY gender_cnt DESC; 
 ```
-Which time of the day do customers give most ratings?
+#### Which time of the day do customers give most ratings?
 ```sql
-SELECT
-	time_of_day,
-	ROUND(AVG(rating),2) AS avg_rating
-FROM sales
-GROUP BY time_of_day
-ORDER BY avg_rating DESC;
+SELECT time_of_day,
+       Round(Avg(rating), 2) AS avg_rating
+FROM   sales
+GROUP  BY time_of_day
+ORDER  BY avg_rating DESC; 
 ```
-Which time of the day do customers give most ratings per branch?
+#### Which time of the day do customers give most ratings per branch?
 ```sql
-SELECT
-	branch, time_of_day,
-	ROUND(AVG(rating),3) AS avg_rating
-FROM sales
-GROUP BY branch, time_of_day
-ORDER BY avg_rating DESC;
+SELECT branch,
+       time_of_day,
+       Round(Avg(rating), 3) AS avg_rating
+FROM   sales
+GROUP  BY branch,
+          time_of_day
+ORDER  BY avg_rating DESC; 
 ```
-Which day fo the week has the best avg ratings?
+#### Which day fo the week has the best avg ratings?
 ```sql
-SELECT
-	day_name,
-	ROUND(AVG(rating),3) AS avg_rating
-FROM sales
-GROUP BY day_name 
-ORDER BY avg_rating DESC;
+SELECT day_name,
+       Round(Avg(rating), 3) AS avg_rating
+FROM   sales
+GROUP  BY day_name
+ORDER  BY avg_rating DESC; 
 ```
-Which day of the week has the best average ratings per branch?
+#### Which day of the week has the best average ratings per branch?
 ```sql
-SELECT 
-	branch, day_name,
-	COUNT(day_name) total_sales
-FROM sales
-GROUP BY branch, day_name
-ORDER BY total_sales DESC;
+SELECT branch,
+       day_name,
+       Count(day_name) total_sales
+FROM   sales
+GROUP  BY branch,
+          day_name
+ORDER  BY total_sales DESC; 
 ```
 ### Sales-related Questions
-Number of sales made in each time of the day per weekday 
+#### Number of sales made in each time of the day per weekday 
 ```sql
-SELECT
-	time_of_day,
-	COUNT(*) AS total_sales
-FROM sales
-GROUP BY time_of_day 
-ORDER BY total_sales DESC;
+SELECT time_of_day,
+       Count(*) AS total_sales
+FROM   sales
+GROUP  BY time_of_day
+ORDER  BY total_sales DESC; 
 ```
-Which of the customer types brings the most revenue?
+#### Which of the customer types brings the most revenue?
 ```sql
-SELECT
-	customer_type,
-	SUM(total) AS total_revenue
-FROM sales
-GROUP BY customer_type
-ORDER BY total_revenue;
+SELECT customer_type,
+       Sum(total) AS total_revenue
+FROM   sales
+GROUP  BY customer_type
+ORDER  BY total_revenue; 
 ```
-Which city has the largest tax/VAT percent?
+#### Which city has the largest tax/VAT percent?
 ```sql
-SELECT
-	city,
-    ROUND(AVG(tax_pct), 2) AS avg_tax_pct
-FROM sales
-GROUP BY city 
-ORDER BY avg_tax_pct DESC;
+SELECT city,
+       Round(Avg(tax_pct), 2) AS avg_tax_pct
+FROM   sales
+GROUP  BY city
+ORDER  BY avg_tax_pct DESC; 
 ```
-Which customer type pays the most in VAT?
+#### Which customer type pays the most in VAT?
 ```sql
-SELECT
-	customer_type,
-	ROUND(AVG(tax_pct),3) AS total_tax
-FROM sales
-GROUP BY customer_type
-ORDER BY total_tax;
+SELECT customer_type,
+       Round(Avg(tax_pct), 3) AS total_tax
+FROM   sales
+GROUP  BY customer_type
+ORDER  BY total_tax; 
 ```
